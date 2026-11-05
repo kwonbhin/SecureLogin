@@ -1,0 +1,18 @@
+{% extends "auth_base.html" %}
+{% block title %}로그인 · SecureLogin{% endblock %}
+{% block content %}
+<h1>로그인</h1>
+{% if error %}
+  <div class="alert {% if state == 'block' %}alert-block{% endif %}">{{ error }}</div>
+{% endif %}
+<form method="post" action="{{ url_for('login') }}" autocomplete="off">
+  <label>아이디
+    <input name="username" value="{{ username or '' }}" placeholder="아이디를 입력하세요" required {% if not username %}autofocus{% endif %}>
+  </label>
+  <label>비밀번호
+    <input name="password" type="password" placeholder="비밀번호를 입력하세요" required {% if username %}autofocus{% endif %}>
+  </label>
+  <button type="submit">로그인</button>
+</form>
+<p class="note">로그인 실패가 반복되면 계정이 일시적으로 잠길 수 있습니다.</p>
+{% endblock %}

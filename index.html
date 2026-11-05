@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SecureLogin — 웹·네트워크 2중 방어 로그인 시스템</title>
+<meta name="description" content="무차별 대입 공격을 웹 차단과 네트워크 탐지 두 층에서 막고, 방어 전/후를 데이터로 증명한 모의해킹 팀 프로젝트.">
+<style>
+  :root{
+    --blue:#2563eb; --blue-d:#1d4ed8; --ink:#0f172a; --slate:#475569; --mut:#64748b;
+    --line:#e2e8f0; --panel:#f1f5f9; --navy:#0f1b2d; --teal:#15897a; --red:#c0392b;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+       color:var(--ink); line-height:1.65; background:#fff; -webkit-font-smoothing:antialiased;}
+  a{color:var(--blue); text-decoration:none}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 20px}
+  section{padding:54px 0; border-bottom:1px solid var(--line)}
+  h2{font-size:24px; margin-bottom:6px}
+  .sub{color:var(--mut); margin-bottom:22px; font-size:15px}
+  img{max-width:100%; border-radius:12px; display:block}
+  .card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px 22px}
+
+  /* hero */
+  .hero{background:linear-gradient(160deg,#0f1b2d,#17304a); color:#fff; padding:70px 0 64px; border:0}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:800; font-size:16px; margin-bottom:34px}
+  .brand i{width:26px; height:26px; border-radius:7px; background:var(--blue); display:inline-block}
+  .kick{color:#9fb8e6; font-weight:800; letter-spacing:.14em; font-size:12px; margin-bottom:12px}
+  .hero h1{font-size:46px; line-height:1.22; font-weight:800; letter-spacing:-.01em}
+  .hero p.lead{color:#cadcfc; font-size:17px; margin-top:16px; max-width:720px}
+  .badges{margin-top:22px; display:flex; gap:8px; flex-wrap:wrap}
+  .badge{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); color:#e8eef9;
+         border-radius:999px; padding:5px 13px; font-size:12.5px; font-weight:600}
+  .btns{margin-top:28px; display:flex; gap:10px; flex-wrap:wrap}
+  .btn{background:var(--blue); color:#fff; border-radius:9px; padding:11px 20px; font-weight:700; font-size:14px}
+  .btn.ghost{background:transparent; border:1px solid rgba(255,255,255,.3); color:#fff}
+  .meta{margin-top:30px; display:flex; gap:28px; flex-wrap:wrap; color:#8aa0c4; font-size:13px}
+  .meta b{display:block; color:#fff; font-size:14px; margin-top:2px}
+
+  /* result */
+  .rtable{width:100%; border-collapse:separate; border-spacing:0; margin-top:16px; border:1px solid var(--line); border-radius:12px; overflow:hidden; font-size:15px}
+  .rtable th{background:var(--navy); color:#eaf0f1; text-align:left; padding:12px 16px; font-size:14px}
+  .rtable td{border-top:1px solid var(--line); padding:13px 16px}
+  .pill{display:inline-block; padding:2px 11px; border-radius:999px; font-size:12.5px; font-weight:800}
+  .pill.off{background:#fdecea; color:var(--red)} .pill.on{background:#e6f2ef; color:var(--teal)}
+  .bad{color:var(--red); font-weight:800} .good{color:var(--teal); font-weight:800}
+  .takeaway{margin-top:16px; border-left:4px solid var(--blue); background:#eff5ff; border-radius:0 10px 10px 0; padding:13px 17px; font-size:15px}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  .feat h3{font-size:16px; color:var(--blue-d); margin-bottom:6px}
+  .feat p{font-size:14px; color:var(--slate)}
+  figure figcaption{font-size:12.5px; color:var(--mut); text-align:center; margin-top:8px}
+  .tags span{display:inline-block; background:var(--panel); color:var(--slate); border-radius:7px; padding:5px 12px; font-size:13px; font-weight:600; margin:0 6px 6px 0}
+  .code{background:var(--navy); color:#d7e3f4; border-radius:10px; padding:14px 16px; font-family:"DejaVu Sans Mono",ui-monospace,monospace; font-size:13px; overflow:auto; white-space:pre-wrap; word-break:break-all}
+  footer{padding:30px 0; color:var(--mut); font-size:13px; text-align:center}
+  @media(max-width:760px){ .hero h1{font-size:32px} .grid2,.grid3{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><i></i>SecureLogin</div>
+    <div class="kick">SKT ALEPH · 모의해킹 팀 프로젝트</div>
+    <h1>같은 공격, 두 겹의 방어</h1>
+    <p class="lead">반복 로그인(무차별 대입) 공격을 <b style="color:#fff">웹(차단)</b>과 <b style="color:#fff">네트워크(탐지)</b> 두 층에서 막고, 같은 조건에서 방어 전/후를 비교해 효과를 데이터로 증명했습니다.</p>
+    <div class="badges">
+      <span class="badge">Python · Flask</span><span class="badge">SQLite</span>
+      <span class="badge">Hydra</span><span class="badge">Suricata</span><span class="badge">VMware</span>
+    </div>
+    <div class="btns">
+      <a class="btn" href="https://github.com/kwonbhin/SecureLogin">GitHub 저장소 ↗</a>
+      <a class="btn ghost" href="#result">결과 보기</a>
+    </div>
+    <div class="meta">
+      <div>웹 층<b>권빈</b></div>
+      <div>네트워크 층<b>전지은</b></div>
+      <div>기간<b>2026.10 ~ 2026.11</b></div>
+      <div>환경<b>격리 VM (VMware)</b></div>
+    </div>
+  </div>
+</header>
+
+<section id="result">
+  <div class="wrap">
+    <h2>핵심 결과 — 방어 전/후</h2>
+    <p class="sub">동일한 공격(<code>hydra -t 1</code>, 같은 비밀번호 사전)을 방어만 바꿔 두 번 수행</p>
+    <img src="docs/images/result-comparison.png" alt="방어 전/후 비교 결과창">
+    <table class="rtable">
+      <tr><th>항목</th><th>방어 OFF</th><th>방어 ON</th></tr>
+      <tr><td>적용 방어</td><td>없음</td><td>계정 잠금 (5회 실패 → 5분)</td></tr>
+      <tr><td>로그인 성공</td><td class="bad">1</td><td class="good">0</td></tr>
+      <tr><td>뚫린 계정</td><td class="bad">victim 탈취</td><td class="good">없음</td></tr>
+    </table>
+    <div class="takeaway"><b>같은 공격, 다른 결과.</b> 방어를 켜자 로그인 성공 <b>1 → 0</b>, 뚫린 계정 <b>victim → 없음</b>.</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>주요 기능 <span style="font-size:15px; color:var(--mut); font-weight:400">· 웹 층 (본인 담당)</span></h2>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card feat"><h3>로그인 사이트</h3><p>Flask·SQLite로 구축. 비밀번호는 해시로 저장하고, 없는 아이디도 더미 해시로 비교해 아이디 노출·응답 시간 차이를 방지.</p></div>
+      <div class="card feat"><h3>로그인 실패 제한</h3><p>계정 10분 5회 실패 → 5분 잠금, IP 10분 20회 실패 → 10분 차단. 잠금 중에는 올바른 비밀번호도 거부.</p></div>
+      <div class="card feat"><h3>이벤트 기록</h3><p>모든 로그인 시도를 DB·로그(KST)에 기록하고 CSV로 내보내기.</p></div>
+      <div class="card feat"><h3>관리자 대시보드</h3><p>방어 ON/OFF 전환, 라운드별 방어 전/후 자동 비교표, 분당 시도 그래프, 상위 IP, 최근 이벤트.</p></div>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <figure><img src="docs/images/login.png" alt="로그인 화면"><figcaption>로그인 화면</figcaption></figure>
+      <figure><img src="docs/images/dashboard.png" alt="관리자 대시보드"><figcaption>관리자 대시보드 — 방어 전/후 비교</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>시스템 구조 — 2중 방어</h2>
+    <p class="sub">네트워크에서 알아채고(탐지), 웹에서 끊는(차단) 심층 방어(Defense in Depth)</p>
+    <img src="docs/images/architecture.png" alt="시스템 구조">
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>무차별 대입 공격 재현 <span style="font-size:15px; color:var(--mut); font-weight:400">· 네트워크 층 (팀원 담당)</span></h2>
+    <p class="sub">Hydra로 victim 계정에 사전 공격 수행</p>
+    <div class="code">hydra -l victim -P pass.txt 192.168.10.111 -s 8080 -t 1 http-post-form "/login:username=^USER^&amp;password=^PASS^:S=환영합니다"</div>
+    <div class="grid2" style="margin-top:16px">
+      <figure><img src="docs/images/attack-hydra.png" alt="Hydra 공격 터미널"><figcaption>공격 터미널 (방어 OFF) — victim / iloveyou 획득</figcaption></figure>
+      <figure><img src="docs/images/event-log.png" alt="계정 잠금 로그"><figcaption>계정 잠금 (방어 ON) — 실패 5회 → 잠금 → 거부</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>기술 스택 · 역할</h2>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card"><h3 style="font-size:15px; color:var(--blue-d); margin-bottom:10px">기술 스택</h3>
+        <div class="tags"><span>Python</span><span>Flask</span><span>SQLite</span><span>werkzeug</span><span>Jinja2</span><span>Kali Linux</span><span>Hydra</span><span>Suricata</span><span>VMware</span></div>
+      </div>
+      <div class="card"><h3 style="font-size:15px; color:var(--blue-d); margin-bottom:10px">역할 (2인 팀)</h3>
+        <p style="font-size:14px; color:var(--slate)"><b style="color:var(--ink)">권빈 · 웹 층</b> — 로그인 사이트, 실패 제한, 이벤트 기록, 관리자 대시보드</p>
+        <p style="font-size:14px; color:var(--slate); margin-top:8px"><b style="color:var(--ink)">전지은 · 네트워크 층</b> — Hydra 공격, Suricata 탐지, 망 구성</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  SecureLogin · SKT ALEPH 팀 프로젝트 (전지은 · 권빈) · 2026 &nbsp;|&nbsp;
+  <a href="https://github.com/kwonbhin/SecureLogin">github.com/kwonbhin/SecureLogin</a>
+</footer>
+
+</body>
+</html>
