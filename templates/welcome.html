@@ -1,0 +1,13 @@
+{% extends "auth_base.html" %}
+{% block title %}환영합니다 · SecureLogin{% endblock %}
+{% block content %}
+<div class="ok-icon">✓</div>
+<h1>{{ user.username }}님, 환영합니다</h1>
+<p class="sub">로그인에 성공했습니다.</p>
+<div class="stack">
+  {% if user.role == 'admin' %}
+    <a class="btn" href="{{ url_for('admin') }}">관리자 대시보드</a>
+  {% endif %}
+  <a class="btn btn-ghost" href="{{ url_for('logout') }}">로그아웃</a>
+</div>
+{% endblock %}
