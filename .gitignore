@@ -1,7 +1,0 @@
-venv/
-__pycache__/
-*.pyc
-securelogin.db
-securelogin.db-*
-securelogin_events.log
-.secret_key
